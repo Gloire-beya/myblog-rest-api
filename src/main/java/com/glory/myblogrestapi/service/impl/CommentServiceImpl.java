@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
     public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository, ModelMapper mapper) {
         this.postRepository = postRepository;
@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto createComment(Long postId, CommentDto commentDto) {
         Comment newComment = mapToEntity(commentDto);
-        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "ID", postId));
         newComment.setPost(post);
         commentRepository.save(newComment);
         return mapToDto(newComment);
@@ -39,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getCommentsByPostId(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "ID", postId));
         List<Comment> commentList = commentRepository.findByPostId(postId);
         return commentList.stream().map(comment -> mapToDto(comment)).collect(Collectors.toList());
     }
