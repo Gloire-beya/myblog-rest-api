@@ -6,12 +6,11 @@ import com.glory.myblogrestapi.payload.PostDto;
 import com.glory.myblogrestapi.payload.PostResponse;
 import com.glory.myblogrestapi.repository.PostRepository;
 import com.glory.myblogrestapi.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +20,11 @@ import java.util.stream.Collectors;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private ModelMapper mapper;
 
-    public PostServiceImpl(PostRepository postRepository) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper mapper) {
         this.postRepository = postRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -72,23 +73,13 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post", "ID", id));
         postRepository.delete(post);
     }
-    // convert DTO to Entity
-    private Post mapToEntity(PostDto postDto){
-        Post post = new Post();
-        post.setId(postDto.getId());
-        post.setDescription(postDto.getDescription());
-        post.setContent(postDto.getContent());
-        post.setTitle(postDto.getTitle());
-        return post;
 
+    // convert DTO to Entity
+    private Post mapToEntity(PostDto postDto) {
+        return mapper.map(postDto, Post.class);
     }
 
-    private PostDto mapToDto(Post post){
-        PostDto postDto = new PostDto();
-        postDto.setId(post.getId());
-        postDto.setDescription(post.getDescription());
-        postDto.setContent(post.getContent());
-        postDto.setTitle(post.getTitle());
-        return postDto;
+    private PostDto mapToDto(Post post) {
+        return mapper.map(post, PostDto.class);
     }
 }

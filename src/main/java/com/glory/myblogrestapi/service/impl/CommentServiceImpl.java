@@ -8,6 +8,7 @@ import com.glory.myblogrestapi.payload.CommentDto;
 import com.glory.myblogrestapi.repository.CommentRepository;
 import com.glory.myblogrestapi.repository.PostRepository;
 import com.glory.myblogrestapi.service.CommentService;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,12 @@ import java.util.stream.Collectors;
 public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private ModelMapper mapper;
 
-    public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository) {
+    public CommentServiceImpl(PostRepository postRepository, CommentRepository commentRepository, ModelMapper mapper) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -76,20 +79,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentDto mapToDto(Comment comment){
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setName(comment.getName());
-        commentDto.setBody(comment.getBody());
-        commentDto.setEmail(comment.getEmail());
-        return commentDto;
+        return mapper.map(comment, CommentDto.class);
     }
 
     private Comment mapToEntity(CommentDto commentDto){
-        Comment comment = new Comment();
-        comment.setId(commentDto.getId());
-        comment.setBody(commentDto.getBody());
-        comment.setEmail(commentDto.getEmail());
-        comment.setName(commentDto.getName());
-        return comment;
+        return mapper.map(commentDto, Comment.class);
     }
 }
